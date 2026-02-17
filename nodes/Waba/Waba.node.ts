@@ -363,14 +363,14 @@ export class Waba implements INodeType {
 							}
 						}
 
-						const response = await this.helpers.request({
+						const response = await this.helpers.httpRequest({
 							method: 'POST',
 							url: `${apiUrl}/api/create-message`,
 							body,
 							json: true,
 						});
 
-						returnData.push({ json: response });
+						returnData.push({ json: response, pairedItem: { item: i } });
 
 					} else if (operation === 'sendFreeform') {
 						// Send Freeform Message
@@ -401,14 +401,14 @@ export class Waba implements INodeType {
 							body.buttons = buttons;
 						}
 
-						const response = await this.helpers.request({
+						const response = await this.helpers.httpRequest({
 							method: 'POST',
 							url: `${apiUrl}/api/create-message-json`,
 							body,
 							json: true,
 						});
 
-						returnData.push({ json: response });
+						returnData.push({ json: response, pairedItem: { item: i } });
 					}
 				} else if (resource === 'template') {
 					if (operation === 'getAll') {
@@ -418,7 +418,7 @@ export class Waba implements INodeType {
 							authkey: authKey,
 						};
 
-						const response = await this.helpers.request({
+						const response = await this.helpers.httpRequest({
 							method: 'POST',
 							url: `${apiUrl}/api/get_templates`,
 							body,
@@ -431,17 +431,17 @@ export class Waba implements INodeType {
 								(t: any) => t.status === 'APPROVED',
 							);
 							for (const template of approvedTemplates) {
-								returnData.push({ json: template });
+								returnData.push({ json: template, pairedItem: { item: i } });
 							}
 						} else {
-							returnData.push({ json: response });
+							returnData.push({ json: response, pairedItem: { item: i } });
 						}
 					}
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const errorMessage = error instanceof Error ? error.message : String(error);
-					returnData.push({ json: { error: errorMessage } });
+					returnData.push({ json: { error: errorMessage }, pairedItem: { item: i } });
 					continue;
 				}
 				throw new NodeOperationError(this.getNode(), error as Error, {
