@@ -1,5 +1,6 @@
 import {
 	IAuthenticateGeneric,
+	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -41,6 +42,18 @@ export class WabaApi implements ICredentialType {
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
+			body: {
+				appkey: '={{$credentials.appKey}}',
+				authkey: '={{$credentials.authKey}}',
+			},
+		},
+	};
+
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.apiUrl}}',
+			url: '/api/get_templates',
+			method: 'POST',
 			body: {
 				appkey: '={{$credentials.appKey}}',
 				authkey: '={{$credentials.authKey}}',
