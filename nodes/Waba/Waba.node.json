@@ -1,0 +1,14 @@
+{
+	"node": "n8n-nodes-base.waba",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://waba.nxccontrols.in/blog/how-to-connect-whatsapp-business-api-to-n8n"
+			}
+		]
+	},
+	"alias": ["WhatsApp", "WABA", "messaging", "chat"]
+}

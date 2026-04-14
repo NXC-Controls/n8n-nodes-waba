@@ -9,6 +9,7 @@ export class WabaApi implements ICredentialType {
 	name = 'wabaApi';
 	displayName = 'WABA API';
 	documentationUrl = 'https://waba.nxccontrols.in/blog/how-to-connect-whatsapp-business-api-to-n8n';
+	icon = 'file:waba.svg' as const;
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API URL',
@@ -22,6 +23,9 @@ export class WabaApi implements ICredentialType {
 			displayName: 'App Key',
 			name: 'appKey',
 			type: 'string',
+			typeOptions: {
+				password: true,
+			},
 			default: '',
 			required: true,
 			description: 'Your WABA application key',

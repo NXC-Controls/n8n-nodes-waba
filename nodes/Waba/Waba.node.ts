@@ -3,7 +3,9 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeOperationError,
+	JsonObject,
+	NodeApiError,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 
 export class Waba implements INodeType {
@@ -18,8 +20,8 @@ export class Waba implements INodeType {
 		defaults: {
 			name: 'WABA',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'wabaApi',
@@ -316,8 +318,6 @@ export class Waba implements INodeType {
 
 		const credentials = await this.getCredentials('wabaApi');
 		const apiUrl = (credentials.apiUrl as string).replace(/\/$/, '');
-		const appKey = credentials.appKey as string;
-		const authKey = credentials.authKey as string;
 
 		for (let i = 0; i < items.length; i++) {
 			try {
@@ -330,8 +330,6 @@ export class Waba implements INodeType {
 						const additionalFields = this.getNodeParameter('additionalFields', i) as any;
 
 						const body: any = {
-							appkey: appKey,
-							authkey: authKey,
 							to,
 							template_id: templateId,
 							language,
@@ -363,7 +361,7 @@ export class Waba implements INodeType {
 							}
 						}
 
-						const response = await this.helpers.httpRequest({
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'wabaApi', {
 							method: 'POST',
 							url: `${apiUrl}/api/create-message`,
 							body,
@@ -382,8 +380,6 @@ export class Waba implements INodeType {
 						const toArray = toRaw.split(',').map(num => num.trim());
 
 						const body: any = {
-							appkey: appKey,
-							authkey: authKey,
 							to: toArray,
 							template_id: 'chat_reply',
 							language: 'en',
@@ -401,7 +397,7 @@ export class Waba implements INodeType {
 							body.buttons = buttons;
 						}
 
-						const response = await this.helpers.httpRequest({
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'wabaApi', {
 							method: 'POST',
 							url: `${apiUrl}/api/create-message-json`,
 							body,
@@ -412,16 +408,10 @@ export class Waba implements INodeType {
 					}
 				} else if (resource === 'template') {
 					if (operation === 'getAll') {
-						// Get All Templates
-						const body = {
-							appkey: appKey,
-							authkey: authKey,
-						};
-
-						const response = await this.helpers.httpRequest({
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'wabaApi', {
 							method: 'POST',
 							url: `${apiUrl}/api/get_templates`,
-							body,
+							body: {},
 							json: true,
 						});
 
@@ -444,7 +434,7 @@ export class Waba implements INodeType {
 					returnData.push({ json: { error: errorMessage }, pairedItem: { item: i } });
 					continue;
 				}
-				throw new NodeOperationError(this.getNode(), error as Error, {
+				throw new NodeApiError(this.getNode(), error as JsonObject, {
 					itemIndex: i,
 				});
 			}
